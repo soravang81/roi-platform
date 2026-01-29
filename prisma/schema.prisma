@@ -1,0 +1,137 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  name          String?
+  email         String?   @unique
+  mobile        String?   @unique
+  password      String
+  referralCode  String    @unique
+  referrerId    String?
+  role          String    @default("USER") // USER, ADMIN, STAFF, DISTRIBUTOR
+  
+  // Income Tracking
+  directBusiness Float    @default(0.0) // Total volume of direct referrals
+  salaryActive   Boolean  @default(false) // Qualified for Salary?
+  
+  isVerified    Boolean   @default(false)
+  kycStatus     String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  kycDocument   String?   // URL or Path to ID proof
+  isBlocked     Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Relations
+  wallets       Wallet[]
+  investments   Investment[]
+  transactions  Transaction[]
+  kycDocs       KYCDoc[]
+  tickets       SupportTicket[]
+  messages      TicketMessage[]
+  
+  referrer      User?  @relation("Referral", fields: [referrerId], references: [id])
+  referees      User[] @relation("Referral")
+}
+
+model Wallet {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String   // INR, USDT, ROI, SALARY, BREAKDOWN
+  balance   Float    @default(0.0)
+  currency  String   @default("INR") 
+  
+  user      User     @relation(fields: [userId], references: [id])
+  
+  @@unique([userId, type])
+}
+
+model InvestmentPlan {
+  id          String   @id @default(uuid())
+  name        String
+  minAmount   Float
+  maxAmount   Float?
+  roiPercent  Float
+  duration    Int      // in days
+  roiFrequency String  // DAILY, WEEKLY, MONTHLY
+  description String?
+  currency    String   @default("USDT") // USDT, INR
+  isActive    Boolean  @default(true)
+  
+  investments Investment[]
+}
+
+model Investment {
+  id          String   @id @default(uuid())
+  userId      String
+  planId      String
+  amount      Float
+  roiEarned   Float    @default(0.0)
+  startDate   DateTime @default(now())
+  endDate     DateTime
+  lastPayoutDate DateTime?
+  status      String   // ACTIVE, COMPLETED, CANCELLED
+  
+  user        User           @relation(fields: [userId], references: [id])
+  plan        InvestmentPlan @relation(fields: [planId], references: [id])
+}
+
+model Transaction {
+  id          String   @id @default(uuid())
+  userId      String
+  amount      Float
+  type        String   // DEPOSIT, WITHDRAWAL, ROI, SALARY, REFERRAL, REFUND
+  status      String   // PENDING, APPROVED, FAILED
+  txId        String?  // Blockchain or Bank TX ID
+  description String?
+  createdAt   DateTime @default(now())
+  
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model KYCDoc {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String   // PAN, AADHAAR, PASSPORT, SELFIE
+  url       String
+  status    String   @default("PENDING")
+  
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model SupportTicket {
+  id          String   @id @default(uuid())
+  userId      String
+  subject     String
+  status      String   @default("OPEN") // OPEN, CLOSED, RESOLVED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  user        User     @relation(fields: [userId], references: [id])
+  messages    TicketMessage[]
+}
+
+model TicketMessage {
+  id          String   @id @default(uuid())
+  ticketId    String
+  userId      String   // Sender (User or Admin)
+  message     String
+  createdAt   DateTime @default(now())
+  
+  ticket      SupportTicket @relation(fields: [ticketId], references: [id])
+  user        User          @relation(fields: [userId], references: [id])
+}
+
+model SystemConfig {
+  id          String   @id @default("CONFIG") // Singleton
+  siteName    String   @default("ROI Platform")
+  supportEmail String?
+  logoUrl     String?
+  updatedAt   DateTime @updatedAt
+}
