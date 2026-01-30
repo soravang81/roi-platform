@@ -75,8 +75,8 @@ export default function TransactionsPage() {
                     <tbody>
                         {loading ? (
                             <tr><td colSpan={5} style={{ padding: '2rem', textAlign: 'center' }}>Loading...</td></tr>
-                        ) : transactions.length > 0 ? (
-                            transactions.map((tx: any) => (
+                        ) : transactions?.length > 0 ? (
+                            transactions?.map((tx: any) => (
                                 <tr key={tx.id} style={{ borderBottom: '1px solid var(--glass-border)' }}>
                                     <td style={{ padding: '1rem' }}>{new Date(tx.createdAt).toLocaleDateString()}</td>
                                     <td style={{ padding: '1rem' }}>
@@ -120,9 +120,9 @@ export default function TransactionsPage() {
                 >
                     Previous
                 </button>
-                <span>Page {pagination.page} of {pagination.totalPages || 1}</span>
+                <span>Page {pagination?.page} of {pagination?.totalPages || 1}</span>
                 <button
-                    disabled={filters.page >= (pagination.totalPages || 1)}
+                    disabled={filters.page >= (pagination?.totalPages || 1)}
                     onClick={() => setFilters(prev => ({ ...prev, page: prev.page + 1 }))}
                     className="btn btn-secondary"
                 >

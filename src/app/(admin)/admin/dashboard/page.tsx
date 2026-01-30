@@ -25,14 +25,17 @@ export default function AdminDashboardPage() {
     }, [])
 
     return (
-        <div>
-            <h2 style={{ marginBottom: '1.5rem' }}>System Overview</h2>
+        <div className="animate-fade-in">
+            <div style={{ marginBottom: '2.5rem' }}>
+                <h2 className="heading-xl text-gradient" style={{ marginBottom: '0.5rem', display: 'inline-block' }}>System Overview</h2>
+                <p style={{ color: 'var(--secondary-foreground)', fontSize: '1.1rem' }}>Welcome back, Administrator. Here's what's happening today.</p>
+            </div>
 
             <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
                 gap: '1.5rem',
-                marginBottom: '2rem'
+                marginBottom: '3rem'
             }}>
                 <StatCard
                     label="Total Users"
@@ -59,21 +62,53 @@ export default function AdminDashboardPage() {
                 />
             </div>
 
-            <div className="glass-panel" style={{ padding: '1.5rem' }}>
-                <h3>Recent Activity</h3>
+            <div className="glass-panel animate-slide-up" style={{ padding: '2rem' }}>
+                <h3 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '1rem' }}>Recent Activity</h3>
                 {stats.recentTransactions.length === 0 ? (
-                    <p style={{ color: 'var(--secondary-foreground)', marginTop: '1rem' }}>No recent activity.</p>
+                    <p style={{ color: 'var(--secondary-foreground)', marginTop: '1rem', fontStyle: 'italic' }}>No recent activity to report.</p>
                 ) : (
-                    <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         {stats.recentTransactions.map((tx: any) => (
-                            <div key={tx.id} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.8rem', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                <div>
-                                    <div style={{ fontWeight: 600 }}>{tx.type}</div>
-                                    <div style={{ fontSize: '0.8rem', opacity: 0.6 }}>{tx.user?.name} - {new Date(tx.createdAt).toLocaleDateString()}</div>
+                            <div key={tx.id} style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                padding: '1rem',
+                                background: 'rgba(255,255,255,0.03)',
+                                borderRadius: '0.75rem',
+                                border: '1px solid rgba(255,255,255,0.05)',
+                                transition: 'all 0.2s'
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                    <div style={{
+                                        width: '40px', height: '40px',
+                                        borderRadius: '10px',
+                                        background: tx.type === 'DEPOSIT' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        fontSize: '1.2rem'
+                                    }}>
+                                        {tx.type === 'DEPOSIT' ? '↓' : '↑'}
+                                    </div>
+                                    <div>
+                                        <div style={{ fontWeight: 600, fontSize: '1rem' }}>{tx.type}</div>
+                                        <div style={{ fontSize: '0.85rem', color: 'var(--secondary-foreground)' }}>{tx.user?.name} &bull; {new Date(tx.createdAt).toLocaleDateString()}</div>
+                                    </div>
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
-                                    <div style={{ fontWeight: 'bold' }}>${tx.amount}</div>
-                                    <div style={{ fontSize: '0.75rem', color: tx.status === 'APPROVED' ? 'var(--success)' : 'orange' }}>{tx.status}</div>
+                                    <div style={{ fontWeight: 'bold', fontSize: '1.1rem', color: tx.type === 'DEPOSIT' ? 'var(--success)' : '#fff' }}>
+                                        {tx.type === 'DEPOSIT' ? '+' : '-'}${tx.amount}
+                                    </div>
+                                    <div style={{
+                                        fontSize: '0.75rem',
+                                        display: 'inline-block',
+                                        padding: '0.2rem 0.6rem',
+                                        borderRadius: '20px',
+                                        background: tx.status === 'APPROVED' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(245, 158, 11, 0.2)',
+                                        color: tx.status === 'APPROVED' ? 'var(--success)' : 'var(--warning)',
+                                        marginTop: '0.25rem'
+                                    }}>
+                                        {tx.status}
+                                    </div>
                                 </div>
                             </div>
                         ))}
