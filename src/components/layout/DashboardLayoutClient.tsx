@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Sidebar from '@/components/layout/Sidebar'
 import Header from '@/components/layout/Header'
 
+
 export default function DashboardLayoutClient({ children }: { children: React.ReactNode }) {
     const [isMobile, setIsMobile] = useState(false)
     const [isSidebarOpen, setSidebarOpen] = useState(false)
@@ -44,7 +45,6 @@ export default function DashboardLayoutClient({ children }: { children: React.Re
                 width: '100%',
                 transition: 'margin-left 0.3s ease'
             }}>
-                {/* Mobile Header Toggle */}
                 {isMobile && (
                     <div style={{ padding: '1rem', display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--background)', borderBottom: '1px solid var(--glass-border)', position: 'sticky', top: 0, zIndex: 30 }}>
                         <button onClick={() => setSidebarOpen(true)} className="btn btn-secondary" style={{ padding: '0.5rem 0.8rem' }}>

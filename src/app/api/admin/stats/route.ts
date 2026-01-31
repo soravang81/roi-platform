@@ -13,26 +13,39 @@ export async function GET(req: Request) {
         if (payload.role !== 'ADMIN') return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
 
         // 1. Total Users
-        const totalUsers = await prisma.user.count({ where: { role: 'USER' } })
+        // const totalUsers = await prisma.user.count({ where: { role: 'USER' } })
 
         // 2. Pending KYC
-        const pendingKyc = await prisma.user.count({ where: { kycStatus: 'PENDING' } })
+        // const pendingKyc = await prisma.user.count({ where: { kycStatus: 'PENDING' } })
 
         // 3. Total Deposits (Approved)
-        const deposits = await prisma.transaction.aggregate({
-            where: { type: 'DEPOSIT', status: 'APPROVED' },
-            _sum: { amount: true }
-        })
+        // const deposits = await prisma.transaction.aggregate({
+        //    where: { type: 'DEPOSIT', status: 'APPROVED' },
+        //    _sum: { amount: true }
+        // })
 
         // 4. Pending Withdrawals
-        const pendingWithdrawals = await prisma.transaction.count({ where: { type: 'WITHDRAWAL', status: 'PENDING' } })
+        // const pendingWithdrawals = await prisma.transaction.count({ where: { type: 'WITHDRAWAL', status: 'PENDING' } })
 
         // 5. Recent Transactions
-        const recentTransactions = await prisma.transaction.findMany({
-            take: 5,
-            orderBy: { createdAt: 'desc' },
-            include: { user: { select: { name: true, email: true } } }
-        })
+        // const recentTransactions = await prisma.transaction.findMany({
+        //    take: 5,
+        //    orderBy: { createdAt: 'desc' },
+        //    include: { user: { select: { name: true, email: true } } }
+        // })
+
+        // Parallelize for speed
+        const [totalUsers, pendingKyc, deposits, pendingWithdrawals, recentTransactions] = await Promise.all([
+            prisma.user.count({ where: { role: 'USER' } }),
+            prisma.user.count({ where: { kycStatus: 'PENDING' } }),
+            prisma.transaction.aggregate({ where: { type: 'DEPOSIT', status: 'APPROVED' }, _sum: { amount: true } }),
+            prisma.transaction.count({ where: { type: 'WITHDRAWAL', status: 'PENDING' } }),
+            prisma.transaction.findMany({
+                take: 5,
+                orderBy: { createdAt: 'desc' },
+                include: { user: { select: { name: true, email: true } } }
+            })
+        ])
 
         return NextResponse.json({
             totalUsers,

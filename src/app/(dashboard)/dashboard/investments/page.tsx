@@ -40,12 +40,13 @@ export default function InvestmentsPage() {
         if (!confirm(confirmMsg)) return
 
         try {
-            const res = await fetch('/api/investments/purchase', {
+            const res = await fetch('/api/investments/buy', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     planId: plan.id,
-                    amount: parseFloat(amount)
+                    amount: parseFloat(amount),
+                    walletType: plan.currency || 'USDT' // 'USDT' or 'INR'
                 })
             })
             const data = await res.json()

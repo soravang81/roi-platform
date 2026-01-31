@@ -5,13 +5,13 @@ import { usePathname } from 'next/navigation'
 
 const menuItems = [
     { label: 'Overview', href: '/admin/dashboard', icon: '🏠' },
-    { label: 'Users', href: '/admin/users', icon: '👥' },
+    { label: 'Users & Roles', href: '/admin/users', icon: '👥' },
+    { label: 'KYC Verify', href: '/admin/users/kyc', icon: '📋' },
     { label: 'Deposits', href: '/admin/deposits', icon: '💰' },
     { label: 'Payouts', href: '/admin/payouts', icon: '💸' },
     { label: 'Plans', href: '/admin/plans', icon: '📦' },
-    { label: 'Transactions', href: '/admin/transactions', icon: '📝' },
+    { label: 'Blog', href: '/admin/blog', icon: '✍️' },
     { label: 'Support', href: '/admin/support', icon: '🎧' },
-    { label: 'Settings', href: '/admin/settings', icon: '⚙️' },
 ]
 
 export default function Sidebar() {

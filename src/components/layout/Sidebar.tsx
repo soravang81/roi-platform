@@ -5,11 +5,14 @@ import { usePathname } from 'next/navigation'
 
 const menuItems = [
     { label: 'Overview', href: '/dashboard', icon: '🏠' },
-    { label: 'Wallets', href: '/dashboard/wallet', icon: '💰' },
     { label: 'Investments', href: '/dashboard/investments', icon: '📈' },
-    // { label: 'Team', href: '/dashboard/team', icon: '👥' },
+    { label: 'Deposit', href: '/dashboard/wallet/deposit', icon: '💰' },
+    { label: 'Withdraw', href: '/dashboard/wallet/withdraw', icon: '💸' },
     { label: 'Transactions', href: '/dashboard/transactions', icon: '📝' },
-    // { label: 'Settings', href: '/dashboard/settings', icon: '⚙️' },
+    { label: 'News & Updates', href: '/dashboard/blog', icon: '📰' },
+    { label: 'Notifications', href: '/dashboard/notifications', icon: '🔔' },
+    { label: 'Profile', href: '/dashboard/profile', icon: '👤' },
+    // { label: 'Support', href: '/dashboard/support', icon: '🎧' },
 ]
 
 export default function Sidebar() {
@@ -32,9 +35,9 @@ export default function Sidebar() {
                 <div className="text-gradient" style={{ fontSize: '1.75rem', fontWeight: '800', letterSpacing: '-0.025em' }}>
                     ROI Platform
                 </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--primary)', opacity: 0.8, marginTop: '0.25rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                {/* <div style={{ fontSize: '0.75rem', color: 'var(--primary)', opacity: 0.8, marginTop: '0.25rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
                     Admin Console
-                </div>
+                </div> */}
             </div>
 
             <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1 }}>

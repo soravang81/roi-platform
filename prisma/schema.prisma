@@ -35,6 +35,7 @@ model User {
   kycDocs       KYCDoc[]
   tickets       SupportTicket[]
   messages      TicketMessage[]
+  notifications Notification[] // Relation to Notifications
   
   referrer      User?  @relation("Referral", fields: [referrerId], references: [id])
   referees      User[] @relation("Referral")
@@ -134,4 +135,50 @@ model SystemConfig {
   supportEmail String?
   logoUrl     String?
   updatedAt   DateTime @updatedAt
+}
+
+model BlogPost {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  content     String   // HTML or Markdown
+  thumbnail   String?
+  author      String
+  tags        String?
+  categoryId  String?
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  category    BlogCategory? @relation(fields: [categoryId], references: [id])
+}
+
+model BlogCategory {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  posts       BlogPost[]
+}
+
+model CMSPage {
+  id          String   @id @default(uuid())
+  slug        String   @unique // e.g. 'about-us', 'terms'
+  title       String
+  content     String
+  isActive    Boolean  @default(true)
+  updatedAt   DateTime @updatedAt
+}
+
+model Notification {
+  id          String   @id @default(uuid())
+  userId      String   // Can be specific user or 'ALL' if we handle broadcast logic in app
+  // For simplicity, let's keep it strictly 1:1 or use a separate Broadcast model.
+  // Actually, requirement says "Send Push ... Filter Recipients".
+  // Let's create individual records for simplicity in MVP.
+  title       String
+  message     String
+  isRead      Boolean  @default(false)
+  type        String?  // INFO, ALERT, SUCCESS
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id])
 }

@@ -4,104 +4,75 @@ import { useState, useEffect } from 'react'
 
 export default function AdminDepositsPage() {
     const [deposits, setDeposits] = useState<any[]>([])
+    const [loading, setLoading] = useState(true)
 
-    const fetchDeposits = () => {
-        fetch('/api/admin/deposits')
-            .then(res => res.json())
-            .then(data => {
-                if (data.deposits) setDeposits(data.deposits)
-            })
+    // Fetch Deposits
+    const fetchDeposits = async () => {
+        try {
+            // Need an API to list deposits. "api/admin/deposits/list"? 
+            // Or reuse "api/transactions?type=DEPOSIT&status=PENDING" logic?
+            // Let's assume we need to Create this list API too or fetch manually?
+            // Actually, usually Admin needs a List API.
+            // I'll create listing logic inline for now or assume a generic one.
+            // Let's create a quick "api/admin/deposits/pending/route.ts" first? 
+            // Or just mock for now? No, user asked for implementation.
+            // I will create the UI to CALL a new "api/admin/deposits/pending" route.
+            const res = await fetch('/api/admin/deposits/pending')
+            const data = await res.json()
+            if (data.deposits) setDeposits(data.deposits)
+        } catch (e) {
+            console.error(e)
+        } finally {
+            setLoading(false)
+        }
     }
 
     useEffect(() => {
         fetchDeposits()
     }, [])
 
-    const handleAction = async (transactionId: string, status: string) => {
-        if (!confirm(`Are you sure you want to ${status} this deposit?`)) return
-
+    const handleAction = async (id: string, action: 'APPROVE' | 'REJECT') => {
+        if (!confirm(`Are you sure you want to ${action} this deposit?`)) return
         try {
-            const res = await fetch('/api/admin/deposits', {
-                method: 'PUT',
+            const res = await fetch('/api/admin/deposits/approve', {
+                method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ transactionId, status }),
+                body: JSON.stringify({ transactionId: id, action })
             })
             if (res.ok) {
-                fetchDeposits() // Refresh list
+                alert('Success')
+                fetchDeposits() // Reload
             } else {
-                alert('Action failed')
+                alert('Failed')
             }
         } catch (e) {
-            console.error(e)
+            alert('Error')
         }
     }
 
     return (
-        <div>
-            <h2 style={{ marginBottom: '2rem' }}>Deposit Requests</h2>
+        <div style={{ padding: '2rem' }}>
+            <h2 className="text-2xl font-bold mb-6">Deposit Requests</h2>
 
-            <div className="glass-panel" style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                    <thead>
-                        <tr style={{ borderBottom: '1px solid var(--glass-border)' }}>
-                            <th style={{ padding: '1rem' }}>User</th>
-                            <th style={{ padding: '1rem' }}>Amount</th>
-                            <th style={{ padding: '1rem' }}>Type</th>
-                            <th style={{ padding: '1rem' }}>Ref ID</th>
-                            <th style={{ padding: '1rem' }}>Status</th>
-                            <th style={{ padding: '1rem' }}>Date</th>
-                            <th style={{ padding: '1rem' }}>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {deposits.map((tx) => (
-                            <tr key={tx.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                <td style={{ padding: '1rem' }}>
-                                    <div>{tx.user?.name}</div>
-                                    <div style={{ fontSize: '0.8rem', color: 'var(--secondary-foreground)' }}>{tx.user?.email}</div>
-                                </td>
-                                <td style={{ padding: '1rem', fontWeight: 'bold' }}>{tx.amount}</td>
-                                <td style={{ padding: '1rem' }}>
-                                    {tx.description.includes('USDT') ? 'USDT' : 'INR'}
-                                </td>
-                                <td style={{ padding: '1rem', fontSize: '0.9rem' }}>{tx.txId}</td>
-                                <td style={{ padding: '1rem' }}>
-                                    <span style={{
-                                        padding: '0.25rem 0.5rem',
-                                        borderRadius: '0.25rem',
-                                        fontSize: '0.8rem',
-                                        background: tx.status === 'PENDING' ? 'rgba(245, 158, 11, 0.2)' :
-                                            tx.status === 'APPROVED' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)',
-                                        color: tx.status === 'PENDING' ? 'var(--warning)' :
-                                            tx.status === 'APPROVED' ? 'var(--success)' : 'var(--error)'
-                                    }}>
-                                        {tx.status}
-                                    </span>
-                                </td>
-                                <td style={{ padding: '1rem', fontSize: '0.9rem' }}>{new Date(tx.createdAt).toLocaleDateString()}</td>
-                                <td style={{ padding: '1rem' }}>
-                                    {tx.status === 'PENDING' && (
-                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                            <button
-                                                onClick={() => handleAction(tx.id, 'APPROVED')}
-                                                style={{ padding: '0.5rem', background: 'var(--success)', border: 'none', borderRadius: '0.25rem', cursor: 'pointer', color: 'white' }}
-                                            >
-                                                ✓
-                                            </button>
-                                            <button
-                                                onClick={() => handleAction(tx.id, 'REJECTED')}
-                                                style={{ padding: '0.5rem', background: 'var(--error)', border: 'none', borderRadius: '0.25rem', cursor: 'pointer', color: 'white' }}
-                                            >
-                                                ✕
-                                            </button>
-                                        </div>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+            {loading ? <p>Loading...</p> : (
+                <div style={{ display: 'grid', gap: '1rem' }}>
+                    {deposits.length === 0 && <p>No pending deposits.</p>}
+                    {deposits.map(d => (
+                        <div key={d.id} className="glass-panel" style={{ padding: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div>
+                                <div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{d.amount} <span style={{ fontSize: '0.9rem', opacity: 0.8 }}>({d.description})</span></div>
+                                <div style={{ fontSize: '0.9rem', opacity: 0.7 }}>User: {d.user.name} ({d.user.email})</div>
+                                <div style={{ fontSize: '0.8rem', opacity: 0.5 }}>{new Date(d.createdAt).toLocaleString()}</div>
+                                <div style={{ fontSize: '0.8rem', fontFamily: 'monospace' }}>TxID: {d.txId}</div>
+                            </div>
+                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                <button onClick={() => handleAction(d.id, 'APPROVE')} className="btn" style={{ background: '#10b981' }}>Approve</button>
+                                <button onClick={() => handleAction(d.id, 'REJECT')} className="btn" style={{ background: '#ef4444' }}>Reject</button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     )
 }

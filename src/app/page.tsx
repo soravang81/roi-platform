@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import Navbar from '@/components/layout/Navbar'
 
 export default function Home() {
     const [scrolled, setScrolled] = useState(false)
@@ -23,22 +24,7 @@ export default function Home() {
             }} />
 
             {/* Navbar */}
-            <nav className={`fixed top-6 left-4 right-4 md:left-8 md:right-8 z-50 transition-all duration-300 rounded-2xl ${scrolled ? 'glass-panel py-3' : 'py-5 bg-transparent'}`}>
-                <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-                        <div className="text-gradient" style={{ fontSize: '1.5rem', fontWeight: 800 }}>ROI Platform</div>
-                        <div className="hidden md:flex" style={{ display: 'flex', gap: '1.5rem', fontSize: '0.95rem', fontWeight: 500, color: 'var(--secondary-foreground)' }}>
-                            <Link href="#features" className="hover:text-white transition-colors">Features</Link>
-                            <Link href="#pricing" className="hover:text-white transition-colors">Pricing</Link>
-                            <Link href="#about" className="hover:text-white transition-colors">About</Link>
-                        </div>
-                    </div>
-                    <div style={{ display: 'flex', gap: '1rem', paddingTop: '1rem' }}>
-                        <Link href="/login" className="btn" style={{ background: 'transparent', border: '1px solid var(--glass-border)' }}>Log In</Link>
-                        <Link href="/register" className="btn btn-primary">Get Started</Link>
-                    </div>
-                </div>
-            </nav>
+            <Navbar />
 
             {/* Hero Section */}
             <section style={{
@@ -96,7 +82,7 @@ export default function Home() {
                         <Link href="/register" className="btn btn-primary" style={{ fontSize: '1.1rem', padding: '1rem 2.5rem', boxShadow: '0 0 20px rgba(14, 165, 233, 0.4)' }}>
                             Start Investing Free
                         </Link>
-                        <Link href="/demo" className="btn" style={{
+                        {/* <Link href="/demo" className="btn" style={{
                             background: 'rgba(255,255,255,0.05)',
                             border: '1px solid var(--glass-border)',
                             fontSize: '1.1rem',
@@ -104,7 +90,7 @@ export default function Home() {
                             backdropFilter: 'blur(10px)'
                         }}>
                             View Live Demo
-                        </Link>
+                        </Link> */}
                     </div>
 
                     {/* Replaced complex mockup with a clean glass card stats preview */}

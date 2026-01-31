@@ -24,11 +24,24 @@ export default function AdminUsersPage() {
     const handleAction = async (id: string, action: string) => {
         if (!confirm(`Are you sure you want to ${action}?`)) return
 
-        await fetch(`/api/admin/users/${id}/status`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action })
-        })
+        if (action.startsWith('PROMOTE') || action === 'DEMOTE_USER') {
+            let role = 'USER'
+            if (action === 'PROMOTE_STAFF') role = 'STAFF'
+            if (action === 'PROMOTE_ADMIN') role = 'ADMIN'
+
+            await fetch('/api/admin/users/role', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ targetUserId: id, role })
+            })
+        } else {
+            await fetch(`/api/admin/users/${id}/status`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action })
+            })
+        }
+
         fetchUsers() // Refresh
     }
 
@@ -94,6 +107,19 @@ export default function AdminUsersPage() {
                                     ) : (
                                         <button onClick={() => handleAction(u.id, 'BLOCK')} className="btn" style={{ fontSize: '0.7rem', border: '1px solid var(--error)', color: 'var(--error)', padding: '0.3rem 0.6rem' }}>Block</button>
                                     )}
+                                    <div style={{ width: '100%', height: '1px', background: 'var(--glass-border)', margin: '0.5rem 0' }}></div>
+                                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                        <span style={{ fontSize: '0.7rem', opacity: 0.7 }}>Role: {u.role}</span>
+                                        {u.role === 'USER' && (
+                                            <>
+                                                <button onClick={() => handleAction(u.id, 'PROMOTE_STAFF')} className="btn" style={{ fontSize: '0.6rem', background: 'var(--primary)', padding: '0.2rem 0.5rem' }}>Make Staff</button>
+                                                <button onClick={() => handleAction(u.id, 'PROMOTE_ADMIN')} className="btn" style={{ fontSize: '0.6rem', border: '1px solid var(--primary)', padding: '0.2rem 0.5rem' }}>Make Admin</button>
+                                            </>
+                                        )}
+                                        {u.role === 'STAFF' && (
+                                            <button onClick={() => handleAction(u.id, 'DEMOTE_USER')} className="btn" style={{ fontSize: '0.6rem', background: 'var(--secondary)', padding: '0.2rem 0.5rem' }}>Demote</button>
+                                        )}
+                                    </div>
                                 </td>
                             </tr>
                         ))}
